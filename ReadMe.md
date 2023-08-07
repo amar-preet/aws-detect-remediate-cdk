@@ -6,12 +6,12 @@ This repository provides a solution to detect and automatically remediate AWS se
 The solution uses AWS Config to continuously monitor and assess AWS resource configurations. When a resource is found to be non-compliant with the defined AWS Config Rules, AWS Lambda functions are triggered to remediate the misconfiguration and bring the resource back to a compliant state.
 
 ## Prerequisites
-AWS CLI installed and configured with appropriate permissions.
-AWS CDK installed.
-Node.js and NPM installed.
-Python 3.8 or later.
+* AWS CLI installed and configured with appropriate permissions.
+* AWS CDK installed.
+* Node.js and NPM installed.
+* Python 3.8 or later.
 
-### Setup
+## Setup
 
 1. Clone the Repository
 
@@ -34,11 +34,10 @@ Deploy the CDK stack:
 cdk deploy
 ```
 
-### Usage
+## Usage
 Once deployed, the solution will start monitoring the AWS resources defined in the AWS Config rules. If a resource is found to be non-compliant, the corresponding Lambda function will be triggered to remediate the misconfiguration.
 
-
-### Cleanup
+## Cleanup
 To avoid incurring future charges, you can destroy the CDK stack
 ```
 cdk destroy
