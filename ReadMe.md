@@ -1,11 +1,15 @@
-# AWS S3 Bucket Encryption Compliance and Remediation
+# AWS Detect & Remediate with CDK
 
-This project sets up an AWS environment to monitor S3 buckets for encryption compliance and automatically remediate non-compliant buckets by encrypting them with a Customer Managed Key (CMK).
+This repository provides a solution to detect and automatically remediate AWS security misconfigurations using AWS CDK (Cloud Development Kit). It focuses on ensuring that AWS resources are compliant with best practices, and if not, it triggers remediation actions.
 
-Prerequisites
+## Overview
+The solution uses AWS Config to continuously monitor and assess AWS resource configurations. When a resource is found to be non-compliant with the defined AWS Config Rules, AWS Lambda functions are triggered to remediate the misconfiguration and bring the resource back to a compliant state.
+
+## Prerequisites
 AWS CLI installed and configured with appropriate permissions.
 AWS CDK installed.
-Python 3.8 or higher.
+Node.js and NPM installed.
+Python 3.8 or later.
 
 ### Setup
 
@@ -31,12 +35,8 @@ cdk deploy
 ```
 
 ### Usage
-Once deployed, the system will automatically monitor S3 buckets in the AWS account for encryption compliance. 
+Once deployed, the solution will start monitoring the AWS resources defined in the AWS Config rules. If a resource is found to be non-compliant, the corresponding Lambda function will be triggered to remediate the misconfiguration.
 
-Detect: If a bucket is found to be non-compliant (i.e., not encrypted with a CMK), the system will:
-Remediate: Create a new KMS key (or use an existing one with the description "Key for encrypting S3 bucket").
-Encrypt the non-compliant S3 bucket with the CMK.
-Logging & Notification: åSend a notification to the specified email address about the non-compliant bucket.
 
 ### Cleanup
 To avoid incurring future charges, you can destroy the CDK stack
