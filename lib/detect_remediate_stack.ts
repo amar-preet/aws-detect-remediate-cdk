@@ -31,7 +31,9 @@ export class DetectRemediateStack extends cdk.Stack {
             handler: 'handler.handler',
             runtime: lambda.Runtime.PYTHON_3_8,
             environment: {
-                'SNS_TOPIC_ARN': nonCompliantNotificationTopic.topicArn
+                'SNS_TOPIC_ARN': nonCompliantNotificationTopic.topicArn,
+                'AWS_ACCOUNT_ID': this.account,  
+                'DEPLOYED_REGION': this.region  
             }
         });
 
@@ -76,6 +78,12 @@ export class DetectRemediateStack extends cdk.Stack {
             resources: ['*'],  // All KMS keys
         }));
 
+        // Grant permissions to send findings to AWS Security Hub
+        detectFunction.addToRolePolicy(new iam.PolicyStatement({
+            actions: ['securityhub:BatchImportFindings'],
+            resources: ['*']
+        }));
+
         // Custom AWS Config rule for S3 Buckets not encrypted with CMK
         const s3EncryptionRule = new config.CfnConfigRule(this, 'S3EncryptionRule', {
             configRuleName: 's3-bucket-cmk-encryption-check',
@@ -89,8 +97,7 @@ export class DetectRemediateStack extends cdk.Stack {
             },
             scope: {
                 complianceResourceTypes: ['AWS::S3::Bucket'],
-            },
-            maximumExecutionFrequency: 'One_Hour'
+            }
         });
 
         detectFunction.role?.addToPrincipalPolicy(putEvaluationsPolicy);
@@ -101,7 +108,7 @@ export class DetectRemediateStack extends cdk.Stack {
         // Grant the Lambda function permissions to publish to the SNS topic
         nonCompliantNotificationTopic.grantPublish(detectFunction);
 
-        // EventBridge rule to trigger Remediation Lambda when Config rule compliance changes
+        // EventBridge rule to trigger Detect Lambda when Config rule compliance changes
         const eventRule = new events.Rule(this, 'ConfigRuleChange', {
             eventPattern: {
                 source: ['aws.config'],
@@ -113,12 +120,28 @@ export class DetectRemediateStack extends cdk.Stack {
             },
         });
 
-        eventRule.addTarget(new targets.LambdaFunction(remediateFunction));
+        eventRule.addTarget(new targets.LambdaFunction(detectFunction));
+
+        // EventBridge rule to trigger Remediation Lambda when Security Hub determines a compliance status of "FAILED"
+        const securityHubFailedRule = new events.Rule(this, 'SecurityHubFailedRule', {
+            eventPattern: {
+                source: ['aws.securityhub'],
+                detailType: ['Security Hub Findings - Imported'],
+                detail: {
+                    findings: {
+                        Compliance: {
+                            Status: ['FAILED']
+                        }
+                    }
+                }
+            }
+        });
+
+        securityHubFailedRule.addTarget(new targets.LambdaFunction(remediateFunction));
 
         // Enable AWS Security Hub
+        // If you have SecurityHub already enable, comment out next 2 lines
         const securityHub = new securityhub.CfnHub(this, 'SecurityHub');
-
-        // Ensure Security Hub is dependent on the Config Rule (optional but ensures ordering)
         securityHub.addDependsOn(s3EncryptionRule);
     }
 }
