@@ -16,6 +16,11 @@ export class EC2TagRuleStack extends cdk.Stack {
             runtime: lambda.Runtime.PYTHON_3_8,
         });
 
+        ec2TagDetectFunction.addToRolePolicy(new iam.PolicyStatement({
+            actions: ['securityhub:BatchImportFindings'],
+            resources: ['*']
+        }));
+        
         // Lambda function for EC2 tag remediation
         const ec2TagRemediateFunction = new lambda.Function(this, 'EC2TagRemediateFunction', {
             code: lambda.Code.fromAsset('./lambda/remediate/'),
