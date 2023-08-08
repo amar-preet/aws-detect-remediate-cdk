@@ -2,7 +2,9 @@
 
 import 'source-map-support/register';
 import * as cdk from '@aws-cdk/core';
-import { DetectRemediateStack } from '../lib/detect_remediate_stack';
+import { S3CMKStack } from '../lib/s3_cmk_stack';
+import { EC2TagRuleStack } from '../lib/ec2_tag_stack';
 
 const app = new cdk.App();
-new DetectRemediateStack(app, 'DetectRemediateStack');
+new S3CMKStack(app, 'S3CMKStack');
+new EC2TagRuleStack(app, 'EC2TagRuleStack')

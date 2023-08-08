@@ -2,7 +2,8 @@ import boto3
 import json
 import logging
 import os
-import datetime
+from datetime import datetime
+
 
 # Setup logging
 logger = logging.getLogger()
@@ -43,8 +44,8 @@ def send_to_security_hub(bucket_name, message):
                 "Types": [
                     "Software and Configuration Checks/AWS Security Best Practices"
                 ],
-                "CreatedAt": str(datetime.datetime.utcnow()),
-                "UpdatedAt": str(datetime.datetime.utcnow()),
+                "CreatedAt": str(datetime.utcnow()),
+                "UpdatedAt": str(datetime.utcnow()),
                 "Severity": {"Label": "HIGH"},
                 "Title": "S3 Bucket Encryption Check",
                 "Description": message,

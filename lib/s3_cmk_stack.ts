@@ -7,9 +7,9 @@ import * as s3 from '@aws-cdk/aws-s3';
 import * as iam from '@aws-cdk/aws-iam';
 import * as sns from '@aws-cdk/aws-sns';
 import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
-import * as securityhub from '@aws-cdk/aws-securityhub';
+//import * as securityhub from '@aws-cdk/aws-securityhub';
 
-export class DetectRemediateStack extends cdk.Stack {
+export class S3CMKStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
         super(scope, id, props);
 
@@ -27,8 +27,8 @@ export class DetectRemediateStack extends cdk.Stack {
 
         // Lambda function for detection
         const detectFunction = new lambda.Function(this, 'DetectFunction', {
-            code: lambda.Code.fromAsset('./lambda/detect'),
-            handler: 'handler.handler',
+            code: lambda.Code.fromAsset('./lambda/detect/'),
+            handler: 's3_cmk_detect_lambda.handler',
             runtime: lambda.Runtime.PYTHON_3_8,
             environment: {
                 'SNS_TOPIC_ARN': nonCompliantNotificationTopic.topicArn,
@@ -39,8 +39,8 @@ export class DetectRemediateStack extends cdk.Stack {
 
         // Lambda function for remediation
         const remediateFunction = new lambda.Function(this, 'RemediateFunction', {
-            code: lambda.Code.fromAsset('./lambda/remediate'),
-            handler: 'handler.handler',
+            code: lambda.Code.fromAsset('./lambda/remediate/'),
+            handler: 's3_cmk_remediate_lambda.py.handler',
             runtime: lambda.Runtime.PYTHON_3_8
         });
 
@@ -141,7 +141,7 @@ export class DetectRemediateStack extends cdk.Stack {
 
         // Enable AWS Security Hub
         // If you have SecurityHub already enable, comment out next 2 lines
-        const securityHub = new securityhub.CfnHub(this, 'SecurityHub');
-        securityHub.addDependsOn(s3EncryptionRule);
+        //const securityHub = new securityhub.CfnHub(this, 'SecurityHub');
+        //securityHub.addDependsOn(s3EncryptionRule);
     }
 }

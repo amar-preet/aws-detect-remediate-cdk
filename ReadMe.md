@@ -31,7 +31,7 @@ cdk bootstrap
 
 Deploy the CDK stack:
 ```
-cdk deploy
+cdk deploy {STACK_NAME}
 ```
 
 ## Usage
