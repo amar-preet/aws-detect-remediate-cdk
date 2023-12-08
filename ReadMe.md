@@ -5,6 +5,9 @@ This repository provides a solution to detect and automatically remediate AWS se
 ## Overview
 The solution uses AWS Config to continuously monitor and assess AWS resource configurations. When a resource is found to be non-compliant with the defined AWS Config Rules, AWS Lambda functions are triggered to remediate the misconfiguration and bring the resource back to a compliant state.
 
+## Architect
+![alt text](detect-and-remediate.png)
+
 ## Prerequisites
 * AWS CLI installed and configured with appropriate permissions.
 * AWS CDK installed.
